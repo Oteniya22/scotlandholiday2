@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Firebase File Upload</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,400italic,600,700' rel='stylesheet'
+		type='text/css'>
+	<link href="css/font-awesome.min.css" rel="stylesheet">
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+	<link href="css/flexslider.css" rel="stylesheet">
+	<link href="css/templatemo-style.css" rel="stylesheet">
+	<link href="./style.css" rel="stylesheet">
+</head>
+
+<body>
+
+
+    <!-- Header -->
+	<div class="tm-header">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 col-md-4 col-sm-3 tm-site-name-container">
+					<a href="#" class="tm-site-name">Scotland Holiday</a>
+				</div>
+				<div class="col-lg-6 col-md-8 col-sm-9">
+					<div class="mobile-menu-icon">
+						<i class="fa fa-bars"></i>
+					</div>
+					<nav class="tm-nav">
+						<ul>
+							<li><a href="index.html" class="active">Home</a></li>
+							<li><a href="tours.html">Tours</a></li>
+							<li><a href="contact.html">Contact</a></li>
+							<li><a href="profile.html">Profile</a></li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+
+    <div>
+        Upload Files<br />
+        <input type="file" id="files" multiple /><br /><br />
+        <button id="send">Upload</button>
+        <p id="uploading"></p>
+        <progress value="0" max="100" id="progress"></progress>
+    </div>
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/7.13.1/firebase-storage.js"></script>
+    <!-- partial -->
+
+    <script>
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAanNzWDN-lR9tM2bNY_EByHZAJzO3lRnc",
+            authDomain: "authentication-app-a3aa1.firebaseapp.com",
+            databaseURL: "https://authentication-app-a3aa1-default-rtdb.firebaseio.com",
+            projectId: "authentication-app-a3aa1",
+            storageBucket: "authentication-app-a3aa1.appspot.com",
+            messagingSenderId: "1072312455583",
+            appId: "1:1072312455583:web:f8ebecec0bf851e6f46daa"
+        };
+        //const firebaseApp = initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
+
+    </script>
+
+    <script>
+
+        var files = [];
+        document.getElementById("files").addEventListener("change", function (e) {
+            files = e.target.files;
+            for (let i = 0; i < files.length; i++) {
+                console.log(files[i]);
+            }
+        });
+
+
+        document.getElementById("send").addEventListener("click", function () {
+            //checks if files are selected
+            if (files.length != 0) {
+
+                //Loops through all the selected files
+                for (let i = 0; i < files.length; i++) {
+
+                    //create a storage reference
+                    var storage = firebase.storage().ref(files[i].name);
+
+                    //upload file
+                    var upload = storage.put(files[i]);
+
+                    //update progress bar
+                    upload.on(
+                        "state_changed",
+                        function progress(snapshot) {
+                            var percentage =
+                                (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            document.getElementById("progress").value = percentage;
+                        },
+
+                        function error() {
+                            alert("error uploading file");
+                        },
+
+                        function complete() {
+                            document.getElementById(
+                                "uploading"
+                            ).innerHTML += `${files[i].name} upoaded <br />`;
+                        }
+                    );
+                }
+            } else {
+                alert("No file chosen");
+            }
+        });
+
+        function getFileUrl(filename) {
+            //create a storage reference
+            var storage = firebase.storage().ref(filename);
+
+            //get file url
+            storage
+                .getDownloadURL()
+                .then(function (url) {
+                    console.log(url);
+                })
+                .catch(function (error) {
+                    console.log("error encountered");
+                });
+        }
+
+
+
+    </script>
+
+
+</body>
+
+</html>
